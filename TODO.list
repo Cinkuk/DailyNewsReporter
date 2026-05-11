@@ -1,0 +1,30 @@
+# writing standard
+ - item format: [√|×] [<TASK_NUMBER>] <task description>
+ - you CAN append new item into corresponding category or delete redundant item if necessary
+ - you MUST move finished item into `[DONE]`  catagory
+
+# Project Status Board (Your working space)
+
+## [MUST]
+
+
+## [IN PROGRESS]
+
+
+## [DONE]
+ - [√] [TASK-014] 移除19个feed
+ - [√] [TASK-015] 新增联合早报(plink.anyfeeder.com)和南方周末(rsshub.rssforever.com); 均为标准RSS, 无需特化parser
+ - [√] [TASK-016] Arxiv AI改为HTML listing page; 构建特化parser(arxiv_parser.py); 禁止API/RSS
+ - [√] [TASK-012] 对于summary-only的feed, 置空title, content存放summary
+ - [√] [TASK-013] 保证全部feeds都能够存入raw_archive并参与后续分类筛选和summary生成流程
+ - [√] [TASK-009] 提交git commit
+ - [√] [TASK-004] Filter original `feeds.ts`. Urls in this file include many unaccessible url and exclude direct information like RSS instead of further url. In one word, ONLY keep feed which can response news information directelty.
+ - [√] [TASK-003] Write category list into target file, e.g. Tech/AI, Tech/OtherScience, Finance, etc
+ - [√] [TASK-008] 以当前状态创建git repository
+ - [√] [TASK-010] 逐个检查feeds.txt中每个feed的可用性 (46 OK: 23全文+23摘要)
+ - [√] [TASK-011] 放宽feed内容标准: 只有summary也允许存入raw_archive
+ - [√] [TASK-002] Design prompt of filter news category and generate brief summary, including response format
+ - [√] [TASK-001] Implement LLM request module (migrated to DeepSeek v4-flash, 1M context)
+ - [√] [TASK-005] Implement RSS feed fetcher module (prefer full content, skip failed feeds)
+ - [√] [TASK-006] Implement HTML report generator module (test first)
+ - [√] [TASK-007] Implement launch.py main orchestrator

@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+.claude/
+data/raw_archive/
+data/report_archive/
+data/temp/
+data/latest_point
+API_KEYS.txt

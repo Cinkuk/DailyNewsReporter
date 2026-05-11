@@ -1,0 +1,23 @@
+# request
+```
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=f'{DEEPSEEK_API_KEY}',
+    base_url="https://api.deepseek.com")
+
+response = client.chat.completions.create(
+    model="deepseek-v4-flash",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant"},
+        {"role": "user", "content": "Hello"},
+    ],
+    stream=False,
+    reasoning_effort="high",
+    extra_body={"thinking": {"type": "enabled"}}
+)
+```
+
+# response
+ChatCompletion(id='e6596b2a-de60-497a-aa73-15dd4186dd4b', choices=[Choice(finish_reason='stop', index=0, logprobs=None, message=ChatCompletionMessage(content='Hello! How can I help you today?', refusal=None, role='assistant', annotations=None, audio=None, function_call=None, tool_calls=None, reasoning_content='We need to respond to the user\'s greeting. The user said "Hello". As a helpful assistant, we should greet back and offer assistance. Keep it simple and friendly.'))], created=1778412194, model='deepseek-v4-flash', object='chat.completion', service_tier=None, system_fingerprint='fp_058df29938_prod0820_fp8_kvcache_20260402', usage=CompletionUsage(completion_tokens=45, prompt_tokens=10, total_tokens=55, completion_tokens_details=CompletionTokensDetails(accepted_prediction_tokens=None, audio_tokens=None, reasoning_tokens=35, rejected_prediction_tokens=None), prompt_tokens_details=PromptTokensDetails(audio_tokens=None, cached_tokens=0), prompt_cache_hit_tokens=0, prompt_cache_miss_tokens=10))
