@@ -1,5 +1,12 @@
 """
 logger class
+Usage:
+1. import Category enumerate
+`from logger import Category as C`
+2. initial logger 
+`log_ctx = logger.Logger("<module name>")`
+3. log message with category
+log_ctx.log(<C.INFO | C.WARN | C.ERR>, <message: str>)
 """
 
 import os
@@ -41,8 +48,7 @@ class LogFileCtx():
             
     def __del__(self):
         print("delete LogFileCtx instance")
-        if self.fp:
-            self.fp.close()
+        self.close()
     
     def getFileFp(self):
         return self.fp

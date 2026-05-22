@@ -21,8 +21,6 @@ def test_file_ptr_valid():
     shutil.rmtree("log")
 
 def test_log_write():
-    os.makedirs("log", exist_ok=True)
-
     log_ctx = logger.Logger("parser")
     log_ctx.log(C.INFO, "INFO test msg")
     log_ctx.log(C.WARN, "WARN test msg")
