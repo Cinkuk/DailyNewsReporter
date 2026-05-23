@@ -1,4 +1,4 @@
-"""Check availability of each feed in feeds.txt.
+"""Check availability of each feed in feeds.txt with feedparser
 
 Reports: HTTP status, parse result, item count, content quality.
 """
@@ -14,70 +14,80 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 import feedparser
 
+# target key 
+kTarget = [
+        "title",
+        "link",
+        "summary",
+        "author",
+        "published_parsed"
+    ]
 
-def check_feed(name: str, url: str, timeout: int = 20) -> dict:
-    """Check a single feed. Returns dict with status info."""
-    result = {
-        'name': name,
-        'url': url,
-        'status': 'unknown',
-        'http_status': None,
-        'entries': 0,
-        'has_content': 0,
-        'has_summary_only': 0,
-        'error': None,
-    }
+# result file
+file = open("feed_availability_result.md", mode="w+", encoding="utf8")
 
+"""
+check availability of specific key in specific feed
+"""
+def TryToGetItem(parsed: feedparser.util.FeedParserDict, name: str) -> bool:
+    entry0 = parsed.entries[0]
+    keys = entry0.keys()
+
+    def character(key: bool)  -> str:
+        if key: return "√"
+        else: return "×"
+    
+    if name in keys: 
+        found = True
+        content = ""
+        detail = ""
+        if entry0[name]: 
+            empty = False
+            content = entry0[name]
+            if isinstance(content, str):
+                detail = f"len: {len(content)}"
+            else:
+                detail = time.strftime("%Y-%m-%d %H:%M:%S", content)
+        else: 
+            empty = True
+        print(f"[Key] {name}, [found]: {character(found)}, [empty]: {character(empty)}, {detail}")
+        if content:
+            print(content[:70])
+        return (found and (not empty))
+    else: 
+        found = False
+        print(f"[Key] {name}, [found]: {character(found)}")
+        return found
+
+
+"""
+check availability of specific entry
+@return True: feed is available
+@return False: feed is not available
+"""
+def test_feed(name: str, url: str) -> bool:
+    print(f"[Feed] {name}")
     try:
-        # feedparser can take a URL directly
-        parsed = feedparser.parse(url)
+        feed = feedparser.parse(url)
+        key_availability = dict()
+        for key in kTarget:
+            avai = TryToGetItem(feed, key)
+            key_availability[key] = "[x]" if avai else "[ ]"
+        print()
+        
+        # write file
+        line = f"| {name} |"
+        for key in kTarget:
+            line += f" {key_availability[key]} |"
+        line += " [ ] |\n"
+        file.write(line)
+
+        return True
     except Exception as e:
-        result['status'] = 'exception'
-        result['error'] = str(e)[:200]
-        return result
-
-    # Check for bozo (parse error)
-    if parsed.bozo:
-        bozo_msg = str(getattr(parsed, 'bozo_exception', 'unknown'))
-        # HTTP status from feedparser
-        status_code = getattr(parsed, 'status', None)
-        result['http_status'] = status_code
-        if status_code and status_code >= 400:
-            result['status'] = f'http_{status_code}'
-            result['error'] = bozo_msg[:200]
-            return result
-        elif not parsed.entries:
-            result['status'] = 'parse_error_no_entries'
-            result['error'] = bozo_msg[:200]
-            return result
-
-    result['http_status'] = getattr(parsed, 'status', 200)
-    result['entries'] = len(parsed.entries)
-
-    if result['entries'] == 0:
-        result['status'] = 'empty'
-        return result
-
-    # Analyze content quality
-    has_content = 0
-    has_summary_only = 0
-    for entry in parsed.entries:
-        content = entry.get('content')
-        summary = entry.get('summary')
-        if content and isinstance(content, list) and len(content) > 0:
-            has_content += 1
-        elif summary:
-            has_summary_only += 1
-
-    result['has_content'] = has_content
-    result['has_summary_only'] = has_summary_only
-
-    if has_content > 0:
-        result['status'] = 'ok_full'
-    else:
-        result['status'] = 'ok_summary_only'
-
-    return result
+        print(f"In parsing, type: {type(e).__name__}, detail: {e}")
+        print()
+        file.write(f"| {name } | [ ] | [ ] | [ ] | [ ] | [ ] |\n")
+        return False
 
 
 def main():
@@ -87,62 +97,30 @@ def main():
     with open(feeds_path, 'r', encoding='utf-8') as f:
         feeds = json.load(f)
 
+    # initial result file
+    head = "| feed name | title | link | content | author | date | custom content format|\n"
+    format = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n"
+    file.write(head)
+    file.write(format)
+    
     total = len(feeds)
-    results = []
-    ok_full = []
-    ok_summary = []
-    failed = []
+    ok = 0
+    failed = 0
 
-    print(f'Checking {total} feeds...\n')
-
-    for i, (name, url) in enumerate(feeds.items()):
-        print(f'[{i+1:3d}/{total}] {name[:50]}...', end=' ', flush=True)
-        r = check_feed(name, url)
-        results.append(r)
-
-        if r['status'].startswith('ok'):
-            print(f'{r["status"]} ({r["entries"]} items)')
-            if r['status'] == 'ok_full':
-                ok_full.append(r)
-            else:
-                ok_summary.append(r)
-        else:
-            err = r.get('error') or ''
-            print(f'FAIL: {r["status"]} — {err[:80]}')
-            failed.append(r)
-
-        time.sleep(0.3)  # Be polite to servers
+    for name, url in feeds.items():
+        status = test_feed(name, url)
+        if status: ok += 1
+        else: failed += 1    
 
     # Summary
     print(f'\n{"="*60}')
     print(f'SUMMARY')
     print(f'{"="*60}')
     print(f'Total:          {total}')
-    print(f'OK (full text): {len(ok_full)}')
-    print(f'OK (summary):   {len(ok_summary)}')
-    print(f'Failed:         {len(failed)}')
+    print(f'OK:             {ok}')
+    print(f'Failed:         {failed}')
 
-    if failed:
-        print(f'\n--- Failed feeds ---')
-        for r in failed:
-            print(f'  [{r["status"]}] {r["name"]}')
-            print(f'    URL: {r["url"]}')
-            print(f'    Error: {r["error"]}')
-
-    if ok_summary:
-        print(f'\n--- Summary-only feeds ---')
-        for r in ok_summary:
-            print(f'  {r["name"]} ({r["entries"]} items)')
-
-    # Save detailed report
-    report_path = os.path.join(
-        os.path.dirname(__file__), '..', 'data', 'temp', 'feed_check_report.json'
-    )
-    os.makedirs(os.path.dirname(report_path), exist_ok=True)
-    with open(report_path, 'w', encoding='utf-8') as f:
-        json.dump(results, f, ensure_ascii=False, indent=2)
-    print(f'\nDetailed report saved to {report_path}')
-
+    file.close()
 
 if __name__ == '__main__':
     main()
