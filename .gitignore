@@ -9,3 +9,5 @@ data/temp/
 data/latest_point
 API_KEYS.txt
 feeds.ts
+log/
+log
