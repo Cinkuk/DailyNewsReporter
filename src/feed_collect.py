@@ -59,7 +59,7 @@ class Collector():
     @return List[InfoItem]
     """
     def filter_time(self, items: List[InfoItem], latest_point: str):
-        new_items = []
+        kept_items = []
         fmt = "%Y-%m-%d %H:%M:%S"
 
         if latest_point == "":
@@ -73,15 +73,15 @@ class Collector():
                 continue
             time = datetime.strptime(time_str, fmt)
             if time > latest_point:
-                new_items.append(item)
+                kept_items.append(item)
                 if time > new_latest_point:
                     new_latest_point = time
         
         # log
         self.logger_.log(C.INFO, 
-                        f"keep {len(new_items)} items, discard {len(items) - len(new_items)} items")
+                        f"keep {len(kept_items)} items, discard {len(items) - len(kept_items)} items")
 
-        return new_items
+        return kept_items
 
 
     """
