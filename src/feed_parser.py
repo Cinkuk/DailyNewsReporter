@@ -31,15 +31,26 @@ class InfoItem():
         self.title_ = title
         self.date_ = date
         self.content_ = content
+        self.category_ = ""
+        self.summary_ = ""
     
     def item(self) -> dict:
         return {
             "url": self.url_,
             "title": self.title_,
             "date": self.date_,
-            "content": self.content_
+            "content": self.content_,
+            "category": self.category_,
+            "summary": self.summary_,
             } 
 
+    def SetCategory(self, content: str):
+        if isinstance(content, str):
+            self.category_ = content
+    
+    def SetSummary(self, content: str):
+        if isinstance(content, str):
+            self.summary_ = content
 
 """
 parser base 
