@@ -43,7 +43,7 @@ content: <content>
 ```
 
 ## TODO
- - [ ] record `title, content, category, summary` after each generation for future model training, change design of data flow
+ - [x] record `title, content, category, summary` after each generation for future model training, change design of data flow
  - [ ] add new feature: send email after HTML report generated
  - [ ] train two model to classify content and generate summary
 
