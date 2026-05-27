@@ -1,21 +1,7 @@
 """LLM prompt templates for news filtering and summarization."""
 
 import json
-
-
-def load_topics(topics_path: str) -> list[str]:
-    """Load enabled topics from topics.txt. Returns list of topic names with ON status."""
-    topics = []
-    with open(topics_path, 'r', encoding='utf-8') as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            if ':' in line:
-                name, status = line.split(':', 1)
-                if status.strip() == 'ON':
-                    topics.append(name.strip())
-    return topics
+from feed_parser import InfoItem
 
 
 FILTER_SYSTEM_PROMPT = """You are a news classifier. Your task is to determine whether a news item is relevant to any of the given topic categories.
@@ -55,7 +41,7 @@ Rules:
 6. Response must be valid JSON only, no other text."""
 
 
-def build_batch_filter_user_prompt(topics: list[str], items: list[dict]) -> str:
+def build_batch_filter_user_prompt(topics: list[str], items: list[InfoItem]) -> str:
     """Build user prompt for batch topic filtering with multiple items."""
     if not items:
         return f"""Available topics:
@@ -68,8 +54,8 @@ No items to classify. Output: {{"results": []}}"""
         items_text += f'''
 ---
 Item {i}:
-Title: {item['title']}
-Content: {item['content'][:1500]}
+Title: {item.title_}
+Content: {item.content_[:1500]}
 '''
 
     return f"""Available topics:
