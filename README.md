@@ -25,9 +25,10 @@ A light-weight, clear-architecture, develop-friendly personal information assita
 5. generate summary of each item via LLM. each summary should no more than 300 words. append summary into HTML document
 
 ## Data Flow
- - feed items: Web -> `/data/raw_archive/`
- - filter items: `/data/raw_archive/<date>` -> `/data/temp/`
- - generate summary: `/data/temp` -> `/data/report_archive`
+ - ~~feed items: Web -> `/data/raw_archive/`~~
+ - ~~filter items: `/data/raw_archive/<date>` -> `/data/temp`~~
+ - ~~generate summary: `/data/temp` -> `/data/report_archive`~~
+ - Web -> [select new items] -> [generate category and summary] -> `/data/raw_archive/<date` and `/data/report_archive`
 
 ## Basic Data Structure
  - item: 
@@ -39,7 +40,7 @@ content: <content>
 ```
  - latest_point:
 ```
-<feed>: <YYYY-MM-DD-HH-MM>
+<feed>: <YYYY-mm-dd HH:MM:SS>
 ```
 
 ## TODO
