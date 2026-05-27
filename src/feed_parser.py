@@ -80,29 +80,29 @@ ScienceDaily
 Mongabay
 """
 class BaseParser():
-    def __init__(self, parse):
-        self.parse_ = parse
+    def __init__(self, response):
+        self.parsed_ = feedparser.parse(response.text)
         # empty parse result or 
-        if (not hasattr(self.parse_, "entries")) or \
-            len(self.parse_.entries) == 0:
-            self.parse_ = [] # adapt to following procedure 
+        if (not hasattr(self.parsed_, "entries")) or \
+            len(self.parsed_.entries) == 0:
+            self.parsed_ = [] # adapt to following procedure 
         self.logger_ = Logger("Parser 'BaseParser'")
     
     def parse(self) -> List[InfoItem]:
         items = []
-        for entry in self.parse_:
+        for entry in self.parsed_.entries:
             keys = entry.keys()
-            if "title" in keys: title = entry["title"]
+            if "title" in keys: title = entry.title
             else: title = ""
-            if "link" in keys: link = entry["link"]
+            if "link" in keys: link = entry.link
             else: link = ""
-            if "summary" in keys: content = entry["summary"]
+            if "summary" in keys: content = entry.summary
             else: content = ""
-            if "published_parsed" in keys: date = strftime("%Y-%m-%d %H:%M:%S", entry["published_parsed"])
+            if "published_parsed" in keys: date = strftime("%Y-%m-%d %H:%M:%S", entry.published_parsed)
             else: date = ""
 
             item = InfoItem(url=link, title=title, date=date, content=content)
-            items.append(item.item())
+            items.append(item)
         
         # log
         self.logger_.log(C.INFO, 
@@ -370,26 +370,35 @@ class NatureNewsParser():
     """
     @staticmethod
     def get_content(url: str) -> str:
-        response = request_url(url)
-
+        response, status_code = request_url(url)
+        if status_code != 200:
+            return ""
+        
         tree = html.fromstring(response.text)
         div_xpath = "//div[@class='c-article-body main-content']"
         divs = tree.xpath(div_xpath)
 
-        p_elements = divs[0].xpath(".//p")
+        if len(divs) > 0:
+            p_elements = divs[0].xpath(".//p")
 
-        paragraphs = []
-        for p in p_elements:
-            p_str = p.text_content().strip()
-            paragraphs.append(p_str)
-        
-        return "/n".join(paragraphs)
+            paragraphs = []
+            for p in p_elements:
+                p_str = p.text_content().strip()
+                paragraphs.append(p_str)
+            
+            return "/n".join(paragraphs)
+
+        return ""
     
     def parse(self) -> List[InfoItem]:
         items = []
         items_on_page = self.get_items_metadata(self.response_)
 
+        i = 1
         for item in items_on_page:
+            self.logger_.log(C.INFO,
+                             f"fetch [{i}/{len(items_on_page)}] item")
+            
             url = item["url"]
             content = self.get_content(url)
             item["content"] = content
@@ -399,6 +408,8 @@ class NatureNewsParser():
                 date=item["date"],
                 content=item["content"],
             ))
+
+            i += 1
         
         # log
         self.logger_.log(C.INFO, 
