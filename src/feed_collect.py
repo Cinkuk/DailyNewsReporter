@@ -77,11 +77,13 @@ class Collector():
                 if time > new_latest_point:
                     new_latest_point = time
         
+        new_latest_point = datetime.strftime(new_latest_point, fmt)
+        
         # log
         self.logger_.log(C.INFO, 
                         f"keep {len(kept_items)} items, discard {len(items) - len(kept_items)} items")
 
-        return kept_items
+        return kept_items, new_latest_point
 
 
     """
@@ -107,9 +109,14 @@ class Collector():
                 latest_time = ""
             else: latest_time = self.latest_point_[feed_name]
 
-            filtered_items.extend(
-                self.filter_time(items, latest_time)
-                )
+            kept_items, new_latest_time = self.filter_time(items, latest_time)
+
+            filtered_items.extend(kept_items)
+            self.latest_point_[feed_name] = new_latest_time
         
         return filtered_items
-            
+    
+
+    """return latest points"""
+    def GetLatestPoint(self):
+        return self.latest_point_
