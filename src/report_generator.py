@@ -9,7 +9,7 @@ def group_by_topic(items: list[dict]) -> OrderedDict:
     """Group items by topic, preserving insertion order."""
     grouped = OrderedDict()
     for item in items:
-        topic = item.get('topic', 'Other')
+        topic = item.get('category', 'Other')
         if topic not in grouped:
             grouped[topic] = []
         grouped[topic].append(item)
