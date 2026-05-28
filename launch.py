@@ -184,7 +184,7 @@ def step4_summarize(items: List[InfoItem], api_key):
 def step6_generate_report(items):
     """Generate HTML report and save."""
     lprint(C.INFO, '[5/5] Generating report...')
-    date_str = datetime.now().strftime('%Y-%m-%d')
+    date_str = datetime.now().strftime('%Y-%m-%d-%H-%M')
     items[:] = [entry.item() for entry in items] # replace InfoItem with dict
     html_content = generate_html(items, date_str)
     report_archive = os.path.join(PROJECT_ROOT, 'data', 'report_archive')
@@ -216,7 +216,7 @@ def main():
     summarized = step4_summarize(relevant, api_key)
 
     # Step 5: save summarized data
-    date_str = datetime.now().strftime('%Y-%m-%d-%H')
+    date_str = datetime.now().strftime('%Y-%m-%d-%H-%M')
     raw_archive = os.path.join(PROJECT_ROOT, 'data', 'raw_archive')
     saved_path = save_items(new_items, date_str, raw_archive)
     lprint(C.INFO, f'Saved raw items to {saved_path}')
