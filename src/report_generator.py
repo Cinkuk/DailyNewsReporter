@@ -31,9 +31,9 @@ def generate_html(items: list[dict], date_str: str) -> str:
         for item in topic_items:
             title = item.get('title', '') or item.get('summary', '')[:80] or 'No Title'
             title_escaped = html.escape(title)
-            link = html.escape(item.get('link', '#'))
+            link = html.escape(item.get('url', '#'))
             feed = html.escape(item.get('feed', ''))
-            time_str = html.escape(item.get('time', ''))
+            time_str = html.escape(item.get('date', ''))
             summary = html.escape(item.get('summary', ''))
 
             items_html += f'''

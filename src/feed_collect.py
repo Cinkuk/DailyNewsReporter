@@ -111,6 +111,9 @@ class Collector():
 
             kept_items, new_latest_time = self.filter_time(items, latest_time)
 
+            for item in kept_items:
+                item.SetFeed(feed_name)
+
             filtered_items.extend(kept_items)
             self.latest_point_[feed_name] = new_latest_time
         

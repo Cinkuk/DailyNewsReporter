@@ -33,6 +33,7 @@ class InfoItem():
         self.content_ = content
         self.category_ = ""
         self.summary_ = ""
+        self.feed_ = ""
     
     def item(self) -> dict:
         return {
@@ -42,6 +43,7 @@ class InfoItem():
             "content": self.content_,
             "category": self.category_,
             "summary": self.summary_,
+            "feed": self.feed_
             } 
 
     def SetCategory(self, content: str):
@@ -51,6 +53,10 @@ class InfoItem():
     def SetSummary(self, content: str):
         if isinstance(content, str):
             self.summary_ = content
+    
+    def SetFeed(self, content: str):
+        if isinstance(content, str):
+            self.feed_ = content
 
 """
 parser base 
