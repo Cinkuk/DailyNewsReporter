@@ -25,7 +25,7 @@ Commodity/GoldSilver: ON
 Commodity/CriticalMinerals: ON
 Government/Policy: ON
 Government/FederalReserve: ON
-Intel/Defense: OFF
-Intel/Crisis: OFF
+Intel/Defense: ON
+Intel/Crisis: ON
 Positive/GoodNews: OFF
 Positive/Science: OFF
